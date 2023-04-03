@@ -1,11 +1,10 @@
 const socket = io();
 const openModalBtn = document.querySelector(".open-modal-btn");
 const deleteButtons = document.querySelectorAll(".delete-btn");
+const addProductBtn = document.querySelector(".submit");
 const form = document.querySelector(".form");
 const modal = document.querySelector(".modal");
 const overlay = document.querySelector(".overlay");
-const browseButton = document.querySelector(".browse-btn");
-const addProductBtn = document.querySelector(".submit");
 
 const openModal = () => {
 	form.classList.remove("hidden");
@@ -25,10 +24,6 @@ const openModal = () => {
 };
 
 const closeModal = () => {
-	// form.classList.add("hidden");
-	// modal.classList.add("hidden");
-	// overlay.classList.add("hidden");
-	// form.classList.add("hidden");
 	form.classList.add("transparent");
 	modal.classList.add("transparent");
 	overlay.classList.add("transparent");
@@ -48,45 +43,7 @@ const random = (max) => {
 	return Math.floor(Math.random() * max);
 };
 
-// const handleAdd = (e) => {
-// 	e.preventDefault;
-// 	const randomIndex = random(PRODUCTS.length);
-// 	const randomProduct = PRODUCTS[randomIndex];
-// 	fetch("/api/products/", {
-// 		method: "POST",
-// 		body: JSON.stringify(randomProduct),
-// 		headers: {
-// 			"Content-Type": "application/json",
-// 		},
-// 	})
-// 		.then((resp) => resp.json())
-// 		.then((data) => {
-// 			if (!data.ok) {
-// 				console.log(data);
-// 				showAlert(data.message, "error");
-// 			} else {
-// 				console.log(data);
-// 				showAlert(data.message, "success");
-// 			}
-// 		});
-// };
-
-const handleDelete = (e) => {
-	e.stopPropagation();
-	const productId = e.target.parentNode.id;
-	fetch(`/api/products/${productId}`, {
-		method: "DELETE",
-		headers: {
-			"Content-Type": "application/json",
-		},
-	});
-};
-
-browseButton.addEventListener("click", (e) => {
-	e.preventDefault();
-});
-
-form.addEventListener("submit", (e) => {
+const handleAdd = (e) => {
 	e.preventDefault();
 	const myFormData = new FormData(e.target);
 	fetch("/api/products", {
@@ -102,7 +59,20 @@ form.addEventListener("submit", (e) => {
 				showAlert(data.message, "error");
 			}
 		});
-});
+};
+
+const handleDelete = (e) => {
+	e.stopPropagation();
+	const productId = e.target.parentNode.id;
+	fetch(`/api/products/${productId}`, {
+		method: "DELETE",
+		headers: {
+			"Content-Type": "application/json",
+		},
+	});
+};
+
+form.addEventListener("submit", handleAdd);
 
 deleteButtons.forEach((element) => {
 	element.addEventListener("click", handleDelete);
@@ -154,7 +124,7 @@ const addProductElement = (data) => {
 		} else {
 			htmlContent += `<div class="no-image">Sin imágenes</div>`;
 		}
-		htmlContent += `</div><div class="delete-btn">Borrar</div>`;
+		htmlContent += `</div><div class="delete-btn btn">Borrar</div>`;
 		listElement.innerHTML = htmlContent;
 		listElement.id = product._id;
 		listElement.classList.add("product-item-full");
@@ -211,11 +181,16 @@ const populateForm = (form, data) => {
 			element.value = "";
 		}
 	});
+
+	const label = document.querySelector(".file-upload__label");
+	const defaultLabelText = "No se seleccionó ninguna imagen";
+	label.textContent = defaultLabelText;
+	label.title = defaultLabelText;
 };
 
 Array.prototype.forEach.call(
 	document.querySelectorAll(".browse-btn"),
-	function (button) {
+	(button) => {
 		const hiddenInput = button.parentElement.querySelector(
 			".file-upload__input"
 		);
